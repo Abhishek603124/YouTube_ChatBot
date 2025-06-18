@@ -1,23 +1,24 @@
-# 🎙️ RAG-based YouTube Chatbot with Hugging Face & LangChain
+# 🎙️ RAG-based YouTube Chatbot with LangChain & Hugging Face
 
-This repository contains a Retrieval-Augmented Generation (RAG) chatbot that answers questions based on transcripts of YouTube videos. It combines the power of vector search and Hugging Face LLMs to produce relevant, contextual answers.
+This project implements a Retrieval-Augmented Generation (RAG) based chatbot that can answer questions using transcripts from YouTube videos. It leverages `LangChain`, `FAISS` for vector search, and Hugging Face models like `LLaMA 3` for generating contextually relevant responses.
 
 ---
 
 ## 📌 Features
 
-- ✅ Automatically fetches and processes YouTube video transcripts.
-- ✅ Splits and embeds text using Hugging Face embeddings.
-- ✅ Stores embeddings in a FAISS vector database.
-- ✅ Performs semantic search to retrieve relevant chunks.
-- ✅ Uses Hugging Face-hosted LLMs (e.g., LLaMA-3 or Zephyr) for response generation.
-- ✅ End-to-end pipeline based on LangChain.
+- ✅ Automatically fetches YouTube video transcripts using `youtube-transcript-api`.
+- ✅ Splits transcript into meaningful chunks using `RecursiveCharacterTextSplitter`.
+- ✅ Generates dense vector embeddings using Hugging Face embedding models.
+- ✅ Stores and retrieves text chunks using FAISS vector store.
+- ✅ Uses semantic search to find the most relevant chunks.
+- ✅ Constructs prompt and sends it to a Hugging Face-hosted LLM (e.g. `LLaMA 3 8B`).
+- ✅ Fully modular pipeline powered by LangChain runnables.
 
 ---
 
 ## 🧠 Architecture
 
-Below is the architecture flowchart of the RAG-based pipeline:
+The chatbot pipeline is illustrated in the diagram below:
 
 ![Flowchart](cce08112-a29a-4834-967c-dee780d21f15.png)
 
@@ -25,30 +26,38 @@ Below is the architecture flowchart of the RAG-based pipeline:
 
 ## 🔁 Workflow
 
-1. **Document Loading**  
-   Transcript is fetched using `youtube-transcript-api`.
+1. **Transcript Fetching**  
+   Uses `YouTubeTranscriptApi` to extract the transcript of a given video ID.
 
-2. **Text Splitting**  
-   The transcript is split into manageable chunks using `RecursiveCharacterTextSplitter`.
+2. **Trimming and Preprocessing**  
+   The transcript is optionally trimmed to a manageable length to reduce token load.
 
-3. **Embedding Generation**  
-   Text chunks are converted into embeddings using a Hugging Face embedding model (`HuggingFaceEmbeddings`).
+3. **Text Splitting**  
+   `RecursiveCharacterTextSplitter` divides the transcript into overlapping chunks for better context handling.
 
-4. **Vector Store Creation**  
-   Embeddings are stored in a FAISS vector store for fast similarity search.
+4. **Embeddings Generation**  
+   Chunks are embedded using `sentence-transformers/all-MiniLM-L6-v2` via `HuggingFaceEmbeddings`.
 
-5. **Retrieval**  
-   Given a user query, the top-k most relevant chunks are retrieved via semantic search.
+5. **FAISS Vector Store Creation**  
+   Embeddings are stored in a FAISS vector store to enable fast vector similarity search.
 
-6. **Prompt Construction**  
-   The query and retrieved chunks are combined into a prompt.
+6. **Retriever Setup**  
+   A retriever queries the FAISS store and returns the top-`k` relevant chunks using semantic search.
 
-7. **Response Generation**  
-   Prompt is passed to a Hugging Face-hosted LLM (e.g., `meta-llama/Meta-Llama-3-8B-Instruct` or `HuggingFaceH4/zephyr-7b-beta`) to generate a response.
+7. **Prompt Construction**  
+   Retrieved chunks and the user's query are merged using a `PromptTemplate`.
+
+8. **LLM Invocation**  
+   The final prompt is sent to a Hugging Face-hosted model like `meta-llama/Meta-Llama-3-8B-Instruct`.
+
+9. **Answer Generation**  
+   The model generates a concise and relevant answer, forming the final response.
 
 ---
 
-## 🚀 Setup Instructions
+## 🚀 Getting Started
+
+> ⚠️ Make sure you have a Hugging Face API key and access to the model you're using.
 
 1. **Clone the repository**
    ```bash
